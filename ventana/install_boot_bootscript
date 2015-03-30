@@ -1,0 +1,12 @@
+# usb start && fatload usb 0 ${loadaddr} install_script && source ${loadaddr}
+#
+ubi part rootfs
+ubi remove rootfs
+ubi create rootfs
+fatload usb 0 ${loadaddr} boot.ubifs
+ubi write ${loadaddr} rootfs ${filesize}
+setenv bootargs 'console=ttymxc1,115200 cma=384M video=mxcfb0:dev=hdmi,bpp=32,1920x1080M@60,if=RGB24 video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off androidboot.hardware=freescale androidboot.console=ttymxc1 androidboot.mode=block androidboot.bootdev=sda'
+setenv bootcmd 'gsc wd enable 60; ubi part rootfs && ubifsmount ubi0:rootfs && ubifsload 10800000 boot/uImage && ubifsload 16000000  boot/uramdisk.img && ubifsload 18000000 boot/$fdt_file2 && ubifsumount && bootm 10800000 16000000 18000000'
+saveenv
+reset
+
