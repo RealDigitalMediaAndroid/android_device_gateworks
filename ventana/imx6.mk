@@ -330,7 +330,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES := \
 	persist.sys.usb.config=mtp
 
 PRODUCT_DEFAULT_DEV_CERTIFICATE := \
-        device/fsl/common/security/testkey
+        device/rdm/common/security/platform
 
 # include a google recommand heap config file.
 include frameworks/native/build/tablet-7in-hdpi-1024-dalvik-heap.mk
