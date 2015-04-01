@@ -138,7 +138,7 @@ done
 mkdir /media/BOOT/boot
 sudo cp -rfv out/target/product/$product/boot/* /media/BOOT/
 # RECOVERY: bootscripts, kernel, and ramdisk-recovery.img
-sudo cp -rfv out/target/product/$product/uImage /media/RECOVER/
+sudo cp -rfv out/target/product/$product/boot/boot/uImage /media/RECOVER/
 sudo cp -rfv out/target/product/$product/uramdisk-recovery.img /media/RECOVER/
 # DATA: user data
 sudo dd if=out/target/product/$product/userdata.img of=${diskname}${prefix}4
