@@ -111,7 +111,7 @@ BOARD_MODEM_HAVE_DATA_DEVICE := false
 #
 # GPS
 #
-USE_ATHR_GPS_HARDWARE := true
+USE_ATHR_GPS_HARDWARE := false
 
 
 #
@@ -143,7 +143,7 @@ USE_GPU_ALLOCATOR := true
 
 
 # Camera hal v2
-IMX_CAMERA_HAL_V2 := true
+IMX_CAMERA_HAL_V2 := false
 
 
 # define frame buffer count
