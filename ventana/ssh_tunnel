@@ -1,0 +1,10 @@
+#!/system/bin/sh
+
+PORT=8000
+[ -f /data/ssh/PORT ] && PORT=$(cat /data/ssh/PORT)
+SSH_HOST=root@tunnel.neocastnetworks.com
+SSH_HOST=root@45.55.157.99
+LONG_OPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+IDENTITY="-i /data/ssh/id_rsa"
+
+ssh ${SSH_HOST} ${LONG_OPTS} ${IDENTITY} -g -N -R :${PORT}:127.0.0.1:22

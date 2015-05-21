@@ -162,6 +162,18 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
 	gmem_info
 
+# RDM debugging
+PRODUCT_PACKAGES += \
+	NeocastAndroid \
+	libssh      \
+	ssh         \
+	sftp        \
+	scp         \
+	sshd        \
+	ssh-keygen  \
+	sshd_config \
+	start-ssh
+
 # Omx related libs, please align to device/fsl/proprietary/omx/fsl-omx.mk
 omx_libs := \
 	core_register					\
@@ -331,6 +343,11 @@ PRODUCT_COPY_FILES +=	\
 	device/fsl/common/display/display_mode_fb0.conf:system/etc/display_mode_fb0.conf \
 	device/fsl/common/display/display_mode_fb2.conf:system/etc/display_mode_fb2.conf \
 	device/fsl/common/display/display_mode_fb4.conf:system/etc/display_mode_fb4.conf
+
+PRODUCT_COPY_FILES +=    \
+	device/gateworks/ventana/authorized_keys:system/etc/security/authorized_keys.default \
+	device/gateworks/ventana/ssh_tunnel:system/bin/ssh_tunnel \
+	device/rdm/common/security/id_rsa:system/etc/security/id_rsa
 
 # we have enough storage space to hold precise GC data
 PRODUCT_TAGS += dalvik.gc.type-precise
