@@ -1,24 +1,39 @@
-$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
-$(call inherit-product, $(SRC_TARGET_DIR)/product/generic.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_small.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/generic_no_telephony.mk)
 $(call inherit-product, $(TOPDIR)frameworks/base/data/sounds/AllAudio.mk)
 # overrides
 PRODUCT_BRAND := Freescale
 PRODUCT_MANUFACTURER := Freescale
 
+# This was my attempt to modify the list od installed packages. The list
+# however is calculated after this, so this has no effect. Leaving it here
+# for documentation of what we want removed.
+
+# PRODUCT_PACKAGES_REMOVE :=                      \
+# 	LiveWallpapers				\
+# 	LiveWallpapersPicker			\
+# 	MagicSmokeWallpapers			\
+# 	Gallery2				\
+# 	Gallery		    			\
+# 	SoundRecorder				\
+# 	Camera					\
+# 	LegacyCamera                            \
+# 	Email					\
+# 	VideoEditor				\
+# 	VisualizationWallpapers			\
+# 	CubeLiveWallpapers			\
+# 	PinyinIME				\
+# 	libjni_pinyinime        		\
+# 	Launcher3				\
+# 	BasicDreams				\
+# 	FSLOta					\
+
+# PRODUCT_PACKAGES := $(filter-out ${PRODUCT_PACKAGES_REMOVE}, ${PRODUCT_PACKAGES})
+
 # Android infrastructures
 PRODUCT_PACKAGES += \
-	Launcher3				\
-	LiveWallpapers				\
-	LiveWallpapersPicker			\
-	MagicSmokeWallpapers			\
-	Gallery2				\
-	Gallery		    			\
-	SoundRecorder				\
 	Camera2					\
-	Camera					\
-	LegacyCamera                            \
-	Email					\
-	FSLOta					\
+	Launcher2				\
 	CactusPlayer                            \
 	WfdSink                                 \
 	wfd                                     \
@@ -26,13 +41,8 @@ PRODUCT_PACKAGES += \
 	libfsl_wfd.so                           \
 	fsl.imx.jar                             \
 	hwcomposer_fsl.imx6.so                  \
-	VideoEditor				\
 	FSLProfileApp				\
 	FSLProfileService			\
-	VisualizationWallpapers			\
-	CubeLiveWallpapers			\
-	PinyinIME				\
-	libjni_pinyinime        		\
 	libRS					\
 	librs_jni				\
 	pppd					\
