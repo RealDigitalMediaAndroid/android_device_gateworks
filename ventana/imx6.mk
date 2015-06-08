@@ -172,7 +172,11 @@ PRODUCT_PACKAGES += \
 	sshd        \
 	ssh-keygen  \
 	sshd_config \
-	start-ssh
+	start-ssh   \
+	i2cdetect   \
+	i2cget      \
+	i2cset      \
+	i2cdump
 
 # Omx related libs, please align to device/fsl/proprietary/omx/fsl-omx.mk
 omx_libs := \
@@ -293,7 +297,7 @@ omx_excluded_libs :=					\
 
 PRODUCT_PACKAGES += $(omx_libs) $(omx_excluded_libs)
 
-PRODUCT_PACKAGES += libubi ubinize ubiformat ubiattach ubidetach ubiupdatevol ubimkvol ubinfo mkfs.ubifs
+PRODUCT_PACKAGES += libubi ubinize ubiformat ubiattach ubidetach ubiupdatevol ubimkvol ubinfo mkfs.ubifs nandwrite flash_erase
 
 # FUSE based emulated sdcard daemon
 PRODUCT_PACKAGES += sdcard
