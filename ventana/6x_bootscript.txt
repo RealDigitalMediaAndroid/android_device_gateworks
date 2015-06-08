@@ -1,13 +1,23 @@
 echo "Gateworks Ventana Android Boot script v1.03"
+echo "RDM BootScript Modifications v1"
+
+# RDM Changes
+# v1 - add android recovery test and partition 2 support
+#    - add default HDMI 1920x1080 if no video detected
 
 # set some defaults
 test -n "$fs"    || fs=ext2
 test -n "$disk"  || disk=0
+test -n "$part"  || part=1
 setenv nextcon 0
+setenv video_default video=mxcfb0:dev=hdmi,bpp=32,1920x1080M@60,if=RGB24 video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off
 setenv bootargs console=${console},${baudrate} ubi.mtd=2
 setenv loadaddr 10800000
 setenv fdt_addr 18000000
 setenv rd_addr  16000000
+
+# boot from partition 2 for Android recovery
+itest.s "x${android_recovery}" == "x1" && part=2
 
 # memory configuration
 if test -n "$mem" ; then
@@ -89,6 +99,11 @@ else
 
   done
 
+  if test "0" = $nextcon ; then
+	setenv bootargs "${bootargs}" ${video_default}
+	setenv nextcon 4
+  fi
+
   # disable remaining mxcfb devices
   while test "4" -ne $nextcon ; do
 	setenv bootargs "${bootargs}" video=mxcfb${nextcon}:off
@@ -110,11 +125,11 @@ if test -n "$dtype" ; then
 	echo "Using dtype from env: $dtype"
 else
 	echo "Detecting boot device (dtype)..."
-	if ${fs}load usb ${disk}:1 ${loadaddr} boot/uImage ; then
+	if ${fs}load usb ${disk}:${part} ${loadaddr} boot/uImage ; then
 		dtype=usb
-	elif ${fs}load mmc ${disk}:1 ${loadaddr} boot/uImage ; then
+	elif ${fs}load mmc ${disk}:${part} ${loadaddr} boot/uImage ; then
 		dtype=mmc
-	elif ${fs}load sata ${disk}:1 ${loadaddr} boot/uImage ; then
+	elif ${fs}load sata ${disk}:${part} ${loadaddr} boot/uImage ; then
 		dtype=sata
 	elif ubifsload ${loadaddr} boot/uImage ; then
 		dtype=nand
@@ -142,7 +157,7 @@ if itest.s "x${dtype}" == "xnand" ; then
 else
 	echo "Booting from block device ${bootdev}..."
 	setenv bootargs "${bootargs}" androidboot.mode=block androidboot.bootdev=${bootdev}
-	setenv fsload "${fs}load ${dtype} ${disk}:1"
+	setenv fsload "${fs}load ${dtype} ${disk}:${part}"
 fi
 
 setenv bootargs "${bootargs}" "${extra}"
