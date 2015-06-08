@@ -348,11 +348,6 @@ PRODUCT_COPY_FILES +=	\
 	device/fsl/common/display/display_mode_fb2.conf:system/etc/display_mode_fb2.conf \
 	device/fsl/common/display/display_mode_fb4.conf:system/etc/display_mode_fb4.conf
 
-PRODUCT_COPY_FILES +=    \
-	device/gateworks/ventana/authorized_keys:system/etc/security/authorized_keys.default \
-	device/gateworks/ventana/ssh_tunnel:system/bin/ssh_tunnel \
-	device/rdm/common/security/id_rsa:system/etc/security/id_rsa
-
 # we have enough storage space to hold precise GC data
 PRODUCT_TAGS += dalvik.gc.type-precise
 

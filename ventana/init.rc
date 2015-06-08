@@ -143,6 +143,11 @@ service watchdogd /sbin/watchdogd 10 20
 service ssh_tunnel /system/bin/logwrapper /system/bin/ssh_tunnel
     class main
 
+on property:net.dns1=*
+    mkdir /data/etc 700 root root
+    rm /data/etc/resolv.conf
+    write /data/etc/resolv.conf "nameserver ${net.dns1}"
+
 on fs
     # mount partitions
     symlink /fstab_${ro.bootmode} /fstab.freescale
