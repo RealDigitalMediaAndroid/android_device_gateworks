@@ -181,8 +181,8 @@ sync && umount ${DEV}1 || error "failed umount"
 
 # RECOVERY: bootscripts, kernel, and ramdisk-recovery.img
 echo "Writing RECOVERY partition..."
-cp -rfv $OUTDIR/boot/boot/uImage ${mnt}/2 >>$LOG || error
-cp -rfv $OUTDIR/uramdisk-recovery.img ${mnt}/2 >>$LOG || error
+cp -rfv $OUTDIR/boot/* ${mnt}/2 >>$LOG || error
+cp -rfv $OUTDIR/uramdisk-recovery.img ${mnt}/2/uramdisk.img >>$LOG || error
 sync && umount ${DEV}2 || error "failed umount"
 
 # DATA: user data
