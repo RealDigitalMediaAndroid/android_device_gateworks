@@ -13,7 +13,7 @@ PRODUCT_MANUFACTURER := Gateworks
 # Files to copy to the root (ramdisk) and system (rom) filesystems
 PRODUCT_COPY_FILES += \
 	device/gateworks/ventana/required_hardware.xml:system/etc/permissions/required_hardware.xml \
-	device/gateworks/ventana/init.rc:root/init.freescale.rc \
+	device/gateworks/ventana/init.freescale.rc:root/init.freescale.rc \
 	device/gateworks/ventana/audio_policy.conf:system/etc/audio_policy.conf \
 	device/gateworks/ventana/audio_effects.conf:system/vendor/etc/audio_effects.conf \
 	device/gateworks/ventana/init.sh:system/bin/init.sh
