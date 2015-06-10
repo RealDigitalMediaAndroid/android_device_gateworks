@@ -1,5 +1,5 @@
 echo "Gateworks Ventana Android Boot script v1.03"
-echo "RDM BootScript Modifications v1"
+echo "RDM BootScript Modifications v2"
 
 # RDM Changes
 # v2 - use android boot images to make life easier
@@ -169,13 +169,13 @@ setenv bootargs "${bootargs}" "${extra}"
 if ${fsload} ${loadaddr} ${boot_img}; then
 	if ${fsload} ${fdt_addr} boot/${fdt_file}; then
 		echo Loaded DTB from boot/${fdt_file}
-		bootm ${loadaddr} - ${fdt_addr}
+		bootm ${loadaddr} ${loadaddr} ${fdt_addr}
 	elif ${fsload} ${fdt_addr} boot/${fdt_file1}; then
 		echo Loaded DTB from boot/${fdt_file1}
-		bootm ${loadaddr} - ${fdt_addr}
+		bootm ${loadaddr} ${loadaddr} ${fdt_addr}
 	elif ${fsload} ${fdt_addr} boot/${fdt_file2}; then
 		echo Loaded DTB from boot/${fdt_file2}
-		bootm ${loadaddr} - ${fdt_addr}
+		bootm ${loadaddr} ${loadaddr} ${fdt_addr}
 	else
 		echo "Error loading device-tree"
 	fi
