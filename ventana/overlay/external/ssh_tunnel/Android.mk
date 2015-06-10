@@ -17,6 +17,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := ngrok
 LOCAL_MODULE_CLASS := EXECUTABLES
 LOCAL_SRC_FILES := ngrok
+LOCAL_REQUIRED_MODULES := ngrok.yml
 include $(BUILD_PREBUILT)
 
 # This symlink is necessary because of ngrok's internal
@@ -50,9 +51,14 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := ssh_tunnel
 LOCAL_MODULE_CLASS := EXECUTABLES
 LOCAL_SRC_FILES := ssh_tunnel
+LOCAL_REQUIRED_MODULES := \
+	ngrok       \
+	authorized_keys.default \
+	sshd        \
+	ssh-keygen  \
+	sshd_config \
+	start-ssh
 include $(BUILD_PREBUILT)
-## Todo: figure out how to make ssh_tunnel auto-include
-##       the others
 
 # Include this in your init.rc:
 

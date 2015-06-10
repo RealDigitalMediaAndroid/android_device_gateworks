@@ -165,15 +165,10 @@ PRODUCT_PACKAGES += \
 # RDM debugging
 PRODUCT_PACKAGES += \
 	NeocastAndroid \
-	libssh      \
 	ssh         \
 	sftp        \
 	scp         \
-	sshd        \
-	ssh-keygen  \
-	sshd_config \
-	start-ssh   \
-	i2cdetect   \
+	ssh_tunnel  \
 	i2cget      \
 	i2cset      \
 	i2cdump
