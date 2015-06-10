@@ -2,6 +2,7 @@ echo "Gateworks Ventana Android Boot script v1.03"
 echo "RDM BootScript Modifications v1"
 
 # RDM Changes
+# v2 - use android boot images to make life easier
 # v1 - add android recovery test and partition 2 support
 #    - add default HDMI 1920x1080 if no video detected
 
@@ -14,10 +15,14 @@ setenv video_default video=mxcfb0:dev=hdmi,bpp=32,1920x1080M@60,if=RGB24 video=m
 setenv bootargs console=${console},${baudrate} ubi.mtd=2
 setenv loadaddr 10800000
 setenv fdt_addr 18000000
-setenv rd_addr  16000000
+# setenv rd_addr  16000000
+setenv boot_img boot.img
 
 # boot from partition 2 for Android recovery
-itest.s "x${android_recovery}" == "x1" && part=2
+if itest.s "x${android_recovery}" == "x1"; then
+  part=2
+  setenv boot_img recovery.img
+fi
 
 # memory configuration
 if test -n "$mem" ; then
@@ -125,13 +130,13 @@ if test -n "$dtype" ; then
 	echo "Using dtype from env: $dtype"
 else
 	echo "Detecting boot device (dtype)..."
-	if ${fs}load usb ${disk}:${part} ${loadaddr} boot/uImage ; then
+	if ${fs}load usb ${disk}:${part} ${loadaddr} ${boot_img} ; then
 		dtype=usb
-	elif ${fs}load mmc ${disk}:${part} ${loadaddr} boot/uImage ; then
+	elif ${fs}load mmc ${disk}:${part} ${loadaddr} ${boot_img} ; then
 		dtype=mmc
-	elif ${fs}load sata ${disk}:${part} ${loadaddr} boot/uImage ; then
+	elif ${fs}load sata ${disk}:${part} ${loadaddr} ${boot_img} ; then
 		dtype=sata
-	elif ubifsload ${loadaddr} boot/uImage ; then
+	elif ubifsload ${loadaddr} ${boot_img} ; then
 		dtype=nand
 	fi
 	echo "detected dtype:$dtype"
@@ -161,16 +166,16 @@ else
 fi
 
 setenv bootargs "${bootargs}" "${extra}"
-if ${fsload} ${loadaddr} boot/uImage && ${fsload} ${rd_addr} boot/uramdisk.img; then
+if ${fsload} ${loadaddr} ${boot_img}; then
 	if ${fsload} ${fdt_addr} boot/${fdt_file}; then
 		echo Loaded DTB from boot/${fdt_file}
-		bootm ${loadaddr} ${rd_addr} ${fdt_addr}
+		bootm ${loadaddr} - ${fdt_addr}
 	elif ${fsload} ${fdt_addr} boot/${fdt_file1}; then
 		echo Loaded DTB from boot/${fdt_file1}
-		bootm ${loadaddr} ${rd_addr} ${fdt_addr}
+		bootm ${loadaddr} - ${fdt_addr}
 	elif ${fsload} ${fdt_addr} boot/${fdt_file2}; then
 		echo Loaded DTB from boot/${fdt_file2}
-		bootm ${loadaddr} ${rd_addr} ${fdt_addr}
+		bootm ${loadaddr} - ${fdt_addr}
 	else
 		echo "Error loading device-tree"
 	fi
