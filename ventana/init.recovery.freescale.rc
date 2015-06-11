@@ -1,0 +1,38 @@
+on early-init
+    loglevel 7
+    
+    # # Set init and its forked children's oom_adj.
+    # write /proc/1/oom_adj -16
+
+    # Set the security context for the init process.
+    # This should occur before anything else (e.g. ueventd) is started.
+    setcon u:r:init:s0
+
+    # # TODO: why here?
+    # # create mountpoints
+    # mkdir /mnt 0775 root system
+
+    #start install_busybox
+
+on init
+    mkdir /boot
+    mkdir /recovery
+
+# Set watchdog timer to 30 seconds and pet it every 10 seconds to get a 20 second margin
+service watchdogd /sbin/watchdogd 10 20
+    class default
+    disabled
+
+service console /sbin/sh
+    disabled
+    critical
+    class default
+    console
+    user root
+    group root
+
+service install_busybox /sbin/busybox --install /sbin
+    oneshot
+    user root
+    group root
+    disabled

@@ -14,6 +14,7 @@ PRODUCT_MANUFACTURER := Gateworks
 PRODUCT_COPY_FILES += \
 	device/gateworks/ventana/required_hardware.xml:system/etc/permissions/required_hardware.xml \
 	device/gateworks/ventana/init.freescale.rc:root/init.freescale.rc \
+	device/gateworks/ventana/init.recovery.freescale.rc:root/init.recovery.freescale.rc \
 	device/gateworks/ventana/audio_policy.conf:system/etc/audio_policy.conf \
 	device/gateworks/ventana/audio_effects.conf:system/vendor/etc/audio_effects.conf \
 	device/gateworks/ventana/init.sh:system/bin/init.sh
