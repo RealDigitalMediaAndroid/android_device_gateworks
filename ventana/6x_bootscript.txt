@@ -1,7 +1,8 @@
 echo "Gateworks Ventana Android Boot script v1.03"
-echo "RDM BootScript Modifications v2"
+echo "RDM BootScript Modifications v3"
 
 # RDM Changes
+# v3 - fixed part environment variable shadowing ours
 # v2 - use android boot images to make life easier
 # v1 - add android recovery test and partition 2 support
 #    - add default HDMI 1920x1080 if no video detected
@@ -9,7 +10,7 @@ echo "RDM BootScript Modifications v2"
 # set some defaults
 test -n "$fs"    || fs=ext2
 test -n "$disk"  || disk=0
-test -n "$part"  || part=1
+test -n "$part"  || setenv part 1
 setenv nextcon 0
 setenv video_default video=mxcfb0:dev=hdmi,bpp=32,1920x1080M@60,if=RGB24 video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off
 setenv bootargs console=${console},${baudrate} ubi.mtd=2
@@ -20,7 +21,7 @@ setenv boot_img boot.img
 
 # boot from partition 2 for Android recovery
 if itest.s "x${android_recovery}" == "x1"; then
-  part=2
+  setenv part 2
   setenv boot_img recovery.img
 fi
 
@@ -166,6 +167,8 @@ else
 fi
 
 setenv bootargs "${bootargs}" "${extra}"
+echo "Trying ${fsload} ${loadaddr} ${boot_img}"
+echo "Args   ${bootargs}"
 if ${fsload} ${loadaddr} ${boot_img}; then
 	if ${fsload} ${fdt_addr} boot/${fdt_file}; then
 		echo Loaded DTB from boot/${fdt_file}
