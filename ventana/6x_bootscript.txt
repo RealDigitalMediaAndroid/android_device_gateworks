@@ -1,11 +1,15 @@
 echo "Gateworks Ventana Android Boot script v1.03"
-echo "RDM BootScript Modifications v3"
+echo "RDM BootScript Modifications v4"
 
 # RDM Changes
+# v4 - turn on gsc watchdog
 # v3 - fixed part environment variable shadowing ours
 # v2 - use android boot images to make life easier
 # v1 - add android recovery test and partition 2 support
 #    - add default HDMI 1920x1080 if no video detected
+
+# enable watchdog
+gsc wd enable 60
 
 # set some defaults
 test -n "$fs"    || fs=ext2
