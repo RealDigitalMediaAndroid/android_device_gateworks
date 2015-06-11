@@ -14,6 +14,8 @@ BOARD_SOC_CLASS := IMX6
 BOARD_SOC_TYPE := IMX6DQ
 PRODUCT_MODEL := Gateworks Ventana
 
+ADDITIONAL_DEFAULT_PROPERTIES += ro.lockscreen.disable.default=1
+
 #
 # Kernel
 #
