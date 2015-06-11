@@ -119,40 +119,58 @@ echo "Partitioning..."
 # 5:SYSTEM   ext4 512MB
 # 6:CACHE    ext4 512MB
 # 7:VENDOR   ext4 10MB
-# 8:MISC     ext4 10MB
-sfdisk --force --no-reread -uM $DEV >>$LOG 2>&1 << EOF
-,20,83,*
-,20,83
-,1024,E
-,,83
-,512,83
-,50,83
-,10,83
-,10,83
+# 8:MISC     raw/emmc 10MB
+#
+# CACHE needs to be big enough to hold an over-the-air update
+# zip file of SYSTEM, BOOT, and part of RECOVERY. If you never
+# plan to use updates via recovery, you can reduce CACHE to
+# something small.
+#
+# sfdisk's parser is garbage. It ignores the first partition
+# start position when using MB units. We could try converting
+# to sectors like this:
+#     echo '8192,40960,L,*' | sfdisk ... -uS $DEV
+# That works. However, when you add more partitions to that,
+# it then complains about the 40960.
+# So, I created the partitions manually using fdisk with a
+# 1GB data partition. I saved the layout using sfdisk's
+# dump format. It has no issues parsing that.
+# After partitioning, we'll use parted to resize the data
+# partition. All of this is because SD cards work
+# best when partitions are aligned to 4MB boundaries.
+#
+# Before resizing, it will look like this:
+#
+# parted $DEV unit MiB print
+#
+# Number  Start    End      Size     Type      File system  Flags
+#  1      4.00MiB  24.0MiB  20.0MiB  primary   fat32        boot
+#  2      24.0MiB  44.0MiB  20.0MiB  primary
+#  3      44.0MiB  1102MiB  1058MiB  extended
+#  5      48.0MiB  560MiB   512MiB   logical
+#  6      564MiB   1076MiB  512MiB   logical
+#  7      1080MiB  1090MiB  10.0MiB  logical
+#  8      1092MiB  1102MiB  10.0MiB  logical
+#  4      1104MiB  2128MiB  1024MiB  primary
+#
+# After resizing on an 8GB SD card, data is 6475MiB.
+#
+sfdisk --force --no-reread -uS $DEV >>$LOG 2>&1 << EOF || error "sfdisk failed"
+# partition table of /dev/sde
+unit: sectors
+
+/dev/sde1 : start=     8192, size=    40960, Id=83, bootable
+/dev/sde2 : start=    49152, size=    40960, Id=83
+/dev/sde3 : start=    90112, size=  2170880, Id= 5
+/dev/sde4 : start=  2260992, size=  2097152, Id=83
+/dev/sde5 : start=    98304, size=  1048576, Id=83
+/dev/sde6 : start=  1155072, size=  1048576, Id=83
+/dev/sde7 : start=  2211840, size=    20480, Id=83
+/dev/sde8 : start=  2236416, size=    20480, Id=83
 EOF
-[ $? -eq 0 ] || error "sfdisk failed"
+parted -- $DEV resizepart 4 -1 || error "parted resize data failed"
 sync || error "sync failed"
 mkdir $mnt
-
-[ $bootloader ] && {
-  # adjust start of first partition to make room for SPL/UBOOT
-  while [ 1 ]; do
-    debug "  Reading partition table"
-    sfdisk --no-reread -d $DEV > $mnt/partitions.txt
-    [ $? -eq 0 ] && break
-  done
-  size=$(grep sdc1 $mnt/partitions.txt | sed -n 's/.*size=\([ 0-9]*\).*/\1/p')
-  sblock=$((partoffset*2048)) # 512B per block
-  eblock=$((size-sblock))
-  sed -i "s~/dev/sdc1.*~/dev/sdc1 : start=$sblock, size=$eblock, Id=83~" \
-    $mnt/partitions.txt
-  while [ 1 ]; do
-    debug "  Adjusting partition start offset to ${partoffset}MiB"
-    sfdisk --force --no-reread -L -uM $DEV >>$LOG 2>&1 < $mnt/partitions.txt
-    [ $? -eq 0 ] && break
-  done
-  sync || error "sync failed"
-}
 
 # sanity-check: verify partitions present
 for n in `seq 1 8` ; do
