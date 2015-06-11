@@ -165,7 +165,8 @@ mkfs.ext4 -q -L BOOT ${DEV}1 || error "mkfs BOOT"
 mkfs.ext4 -q -L RECOVER ${DEV}2 || error "mkfs RECOVER"
 mkfs.ext4 -q -L CACHE ${DEV}6 || error "mkfs CACHE"
 mkfs.ext4 -q -L VENDOR ${DEV}7 || error "mkfs VENDOR"
-mkfs.ext4 -q -L MISC ${DEV}8 || error "mkfs MISC"
+# MISC is used as a raw place to pass bytes back
+# and forth between android and recovery
 
 echo "Mounting partitions..."
 for n in 1 2 ; do
