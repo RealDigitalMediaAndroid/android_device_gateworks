@@ -27,36 +27,83 @@ error() {
 
 trap "cleanup; exit;" SIGINT SIGTERM
 
+usage() {
+  echo ""
+  echo "Usage: $(basename 0) [OPTIONS] <blockdev>|<dist folder>"
+  echo ""
+  echo "Options:"
+  echo " --force,-f     - force disk"
+  echo " --verbose,-v   - increase verbosity"
+  echo " --dist,-d      - make distribution folder"
+}
+
 # parse cmdline options
 while [ "$1" ]; do
   case "$1" in
     --verbose|-v) verbose=$((verbose+1)); [ $verbose -gt 1 ] && LOG=1; shift;;
+    --dist|-d) distribute=1; shift;;
+    --help|-h) usage; exit 0;;
     *) DEV=$1; shift;;
   esac
 done
+
+[ "$DEV" ] || { usage; exit -1; }
+
+echo "Gateworks Ventana Android disk imaging tool v1.02"
+[ "$LOG" ] && { echo "Logging to $LOG"; rm -f $LOG; }
+[ "$LOG" ] || LOG=/dev/null
+
+# determine appropriate OUTDIR (where build artifacts are located)
+# - can be passed in env via OUTDIR
+# - could be in env via ANDROID_PRODUCT_OUT
+# - will be out/target/product/$product if dir exists
+# - else current dir
+# if this script was copied using --dist|-d, always the dir containing
+# this script
+#####OUTDIR="$(dirname "$0")"
+set_outdir() {
+    [ -d "$OUTDIR" ] && return
+    [ -d "$ANDROID_PRODUCT_OUT" ] && { OUTDIR="$ANDROID_PRODUCT_OUT"; return; }
+    [ -d out/target/product/$product ] && { OUTDIR=out/target/product/$product; return; }
+    OUTDIR=.
+}
+set_outdir
+echo "Installing artifacts from $OUTDIR..."
+
+# verify build artifacts
+BUILD_ARTIFACTS="boot.img recovery.img userdata.img system.img SPL u-boot.img"
+for i in $BUILD_ARTIFACTS ; do
+   debug "  checking file: $OUTDIR/$i"
+   [ -f "$OUTDIR/$i" ] || error "Missing file: $OUTDIR/$i"
+done
+[ "$(ls $OUTDIR/boot/boot/*dtb 2>/dev/null)" ] \
+    || error 'Missing file(s): '"$OUTDIR"'/boot/boot/*dtb'
+[ "$(ls $OUTDIR/boot/boot/*bootscript* 2>/dev/null)" ] \
+    || error 'Missing file(s): '"$OUTDIR"'/boot/boot/*bootscript*'
+
+[ "$distribute" ] && {
+    # Install this script and the build artifacts into $DEV, a folder
+    mkdir -p "$DEV"
+    sed 's,^#####OUTDIR=,OUTDIR=,' < "$0" > "$DEV"/"$(basename "$0")"
+    chmod a+x "$DEV"/"$(basename "$0")"
+    for i in $BUILD_ARTIFACTS ; do
+	cp -f "$OUTDIR"/$i "$DEV"
+    done
+    mkdir -p "$DEV"/boot/boot
+    cp -f $OUTDIR/boot/boot/*dtb "$DEV"/boot/boot
+    cp -f $OUTDIR/boot/boot/*bootscript* "$DEV"/boot/boot
+    echo "All files copied to $DEV"
+    exit 0
+}
 
 # verify root
 [ $EUID -ne 0 ] && error "must be run as root"
 
 # verify dependencies
-for i in ls cat grep mount umount sfdisk sync mkfs.ext4 dd pv cp e2label e2fsck resize2fs rm awk; do
+for i in ls cat grep mount umount sfdisk parted sync mkfs.ext4 dd pv cp e2label e2fsck resize2fs rm awk; do
   which $i 2>&1 >/dev/null
   [ $? -eq 1 ] && error "missing '$i' - please install"
 done
-
-[ "$DEV" ] || {
-  echo ""
-  echo "Usage: $(basename 0) [OPTIONS] <blockdev>"
-  echo ""
-  echo "Options:"
-  echo " --force,-f     - force disk"
-  echo " --verbose,-v   - increase verbosity"
-  exit -1
-}
-
-echo "Gateworks Ventana Android disk imaging tool v1.01"
-[ "$LOG" ] && { echo "Logging to $LOG"; rm -f $LOG; }
-[ "$LOG" ] || LOG=/dev/null
 
 # verify output device
 [ -b "$DEV" ] || error "$DEV is not a valid block device"
@@ -68,22 +115,6 @@ echo "Gateworks Ventana Android disk imaging tool v1.01"
 }
 mounts="$(grep "^$DEV" /proc/mounts | awk '{print $1}')"
 [ "$mounts" ] && error "$DEV has mounted partitions: $mounts"
-
-# determine appropriate OUTDIR (where build artifacts are located)
-# - can be passed in env via OUTDIR
-# - will be out/target/product/$product if dir exists
-# - else current dir
-[ -d "$OUTDIR" ] || {
-  OUTDIR=.
-  [ -d out/target/product/$product ] && OUTDIR=out/target/product/$product
-}
-echo "Installing artifacts from $OUTDIR..."
-
-# verify build artifacts
-for i in boot.img recovery.img userdata.img system.img SPL u-boot.img; do
-   debug "  checking file: $OUTDIR/$i"
-   [ -f "$OUTDIR/$i" ] || error "Missing file: $OUTDIR/$i"
-done
 
 echo "Installing on $DEV..." ;
 
