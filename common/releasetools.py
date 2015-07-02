@@ -11,7 +11,7 @@ def FullOTA_InstallEnd(info):
     # info.script.FormatPartition("/boot")
     info.script.Mount("/boot")
     info.script.UnpackPackageDir("BOOT_EXTRA", "/boot")
-    info.script.AppendExtra('package_extract_file("boot.img", "/boot");')
+    info.script.AppendExtra('package_extract_file("boot.img", "/boot/boot.img");')
     # TODO: do this differently, the current process generates recovery.img
     # on the next boot. So, if boot.img is bad, we're screwed.
     # info.script.FormatPartition("/recovery")
