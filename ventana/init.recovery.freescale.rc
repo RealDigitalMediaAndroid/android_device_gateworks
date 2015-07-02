@@ -17,6 +17,9 @@ on early-init
 on init
     mkdir /boot
     mkdir /recovery
+    chmod 0755 /res/kobs-ng
+    chmod 0755 /res/flash_erase
+    chmod 0755 /res/nandwrite
 
 # Set watchdog timer to 30 seconds and pet it every 10 seconds to get a 20 second margin
 service watchdogd /sbin/watchdogd 10 20
