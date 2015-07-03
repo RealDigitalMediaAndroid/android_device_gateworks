@@ -216,6 +216,7 @@ mkfs.ext4 -q -L CACHE ${DEV}6 || error "mkfs CACHE"
 mkfs.ext4 -q -L VENDOR ${DEV}7 || error "mkfs VENDOR"
 # MISC is used as a raw place to pass bytes back
 # and forth between android and recovery
+dd if=/dev/zero of=${DEV}8 count=1 bs=1M oflag=sync status=none
 
 echo "Mounting partitions..."
 for n in 1 2 ; do
