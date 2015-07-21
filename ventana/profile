@@ -1,0 +1,2 @@
+# Grab the exported environment from init for shells
+eval $(busybox sed -nE '/^[ ]*export/ s,( *export *[^ ]+)( *)(.*),\1=\3,p' /init*rc)

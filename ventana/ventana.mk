@@ -17,6 +17,7 @@ PRODUCT_COPY_FILES += \
 	device/gateworks/ventana/init.recovery.freescale.rc:root/init.recovery.freescale.rc \
 	device/gateworks/ventana/audio_policy.conf:system/etc/audio_policy.conf \
 	device/gateworks/ventana/audio_effects.conf:system/vendor/etc/audio_effects.conf \
+	device/gateworks/ventana/profile:system/etc/profile \
 	device/gateworks/ventana/init.sh:system/bin/init.sh
 
 PRODUCT_COPY_FILES +=	\
