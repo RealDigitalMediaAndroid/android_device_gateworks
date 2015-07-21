@@ -261,3 +261,7 @@ chmod -R 777 /dev/bus/usb
 
 # execute user-specifc init script
 [ -x /data/bin/init.sh ] && /data/bin/init.sh
+
+if [ -e /sdcard/Android/data/com.rdm.neocast/bin/rdmrotatescreen ]; then
+	sh /sdcard/Android/data/com.rdm.neocast/bin/rdmrotatescreen
+fi
