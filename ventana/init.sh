@@ -265,3 +265,7 @@ chmod -R 777 /dev/bus/usb
 if [ -e /sdcard/Android/data/com.rdm.neocast/bin/rdmrotatescreen ]; then
 	sh /sdcard/Android/data/com.rdm.neocast/bin/rdmrotatescreen
 fi
+
+if [ -e /data/misc/wifi ]; then
+	chown system /data/misc/wifi
+fi
