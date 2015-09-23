@@ -269,3 +269,8 @@ fi
 if [ -e /data/misc/wifi ]; then
 	chown system /data/misc/wifi
 fi
+
+sysfs_powerdown=/sys/devices/soc0/soc.1/2100000.aips-bus/21a0000.i2c/i2c-0/0-0020/powerdown
+if [ -e $sysfs_powerdown ]; then
+	chown root.system $sysfs_powerdown
+fi
