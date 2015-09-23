@@ -49,7 +49,7 @@ done
 
 [ "$DEV" ] || { usage; exit -1; }
 
-echo "Gateworks Ventana Android disk imaging tool v1.02"
+echo "Gateworks Ventana Android disk imaging tool v1.03"
 [ "$LOG" ] && { echo "Logging to $LOG"; rm -f $LOG; }
 [ "$LOG" ] || LOG=/dev/null
 
@@ -86,7 +86,7 @@ done
     mkdir -p "$DEV"
     sed 's,^#####OUTDIR=,OUTDIR=,' < "$0" > "$DEV"/"$(basename "$0")"
     chmod a+x "$DEV"/"$(basename "$0")"
-    for i in $BUILD_ARTIFACTS ; do
+    for i in $BUILD_ARTIFACTS ventana-ota-20150123.zip ; do
 	cp -f "$OUTDIR"/$i "$DEV"
     done
     mkdir -p "$DEV"/boot/boot
