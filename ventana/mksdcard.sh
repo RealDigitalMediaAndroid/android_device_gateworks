@@ -259,3 +259,11 @@ resize2fs ${DEV}5 >>$LOG 2>&1 || error "resize2fs failed"
 sync
 
 cleanup
+
+# VMware Fusion doesn't do sync and eject properly. So, add a 5 second sleep
+# between to give it time to finish writing. The eject is so you can safely
+# unplug the card reader after this scripts finishes.
+sync
+sleep 5
+sync
+eject ${DEV}
