@@ -18,5 +18,17 @@
 # (like "CRB01").  It must be a single word, and is
 # capitalized by convention.
 
-export BUILD_ID=2.0.0
-export BUILD_NUMBER=20150123
+export BUILD_ID=A5100
+
+# BUILD_NUMBER Format: date-hash[+], e.g. 20151003-abcd+
+BUILD_NUMBER:=$(shell date +%Y%m%d)-$(shell git rev-parse HEAD | cut -c -4)
+
+# repo status takes a while to run, and this file is included every time
+# make is run including the "lunch" command which runs make 10+ times
+ifneq (,$(filter droid otagenerate,$(MAKECMDGOALS)))
+ifneq (,$(shell git status -s)$(shell repo status))
+	BUILD_NUMBER:=$(BUILD_NUMBER)+
+endif
+endif
+
+export BUILD_NUMBER
