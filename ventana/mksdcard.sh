@@ -81,9 +81,16 @@ done
 [ "$(ls $OUTDIR/boot/boot/*bootscript* 2>/dev/null)" ] \
     || error 'Missing file(s): '"$OUTDIR"'/boot/boot/*bootscript*'
 
+xtrace_is_set() {
+    [ "$(set -o | grep '^xtrace[ 	]*on$')" != "" ]
+}
+
 [ "$distribute" ] && {
     # Install this script and the build artifacts into $DEV, a folder
     mkdir -p "$DEV"
+    if xtrace_is_set; then
+	trap "rm -rf \"$DEV\"" ERR
+    fi
     sed 's,^#####OUTDIR=,OUTDIR=,' < "$0" > "$DEV"/"$(basename "$0")"
     chmod a+x "$DEV"/"$(basename "$0")"
     ota_update="$(cd "$OUTDIR"; ls -1tr ventana-ota-*zip | tail -1)"
