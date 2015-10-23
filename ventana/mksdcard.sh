@@ -86,7 +86,11 @@ done
     mkdir -p "$DEV"
     sed 's,^#####OUTDIR=,OUTDIR=,' < "$0" > "$DEV"/"$(basename "$0")"
     chmod a+x "$DEV"/"$(basename "$0")"
-    for i in $BUILD_ARTIFACTS ventana-ota-20150123.zip ; do
+    ota_update="$(cd "$OUTDIR"; ls -1tr ventana-ota-*zip | tail -1)"
+    [ -f "$OUTDIR/$ota_update" ] || error "Missing file: $OUTDIR/$ota_update"
+    manifest="system/etc/manifest.xml"
+    [ -f "$OUTDIR/$manifest" ] || error "Missing file: $OUTDIR/$manifest"
+    for i in $BUILD_ARTIFACTS $ota_update $manifest; do
 	cp -f "$OUTDIR"/$i "$DEV"
     done
     mkdir -p "$DEV"/boot/boot

@@ -31,6 +31,9 @@ PRODUCT_COPY_FILES +=	\
 	device/gateworks/common/input/EP0810M09.idc:system/usr/idc/EP0810M09.idc \
 	device/gateworks/common/input/TSC2007_Touchscreen.idc:system/usr/idc/TSC2007_Touchscreen.idc
 
+PRODUCT_COPY_FILES += \
+	device/gateworks/ventana/mksdcard.sh:mksdcard.sh
+
 DEVICE_PACKAGE_OVERLAYS := device/gateworks/ventana/overlay
 
 PRODUCT_CHARACTERISTICS := tablet
