@@ -93,16 +93,21 @@ xtrace_is_set() {
     fi
     sed 's,^#####OUTDIR=,OUTDIR=,' < "$0" > "$DEV"/"$(basename "$0")"
     chmod a+x "$DEV"/"$(basename "$0")"
-    ota_update="$(cd "$OUTDIR"; ls -1tr ventana-ota-*zip | tail -1)"
+    build_prop="system/build.prop"
+    [ -f "$OUTDIR/$build_prop" ] || error "Missing file: $OUTDIR/$build_prop"
+    build_version=$(awk -F= '/^ro.build.version.incremental=/ { print $2 }' "${OUTDIR}"/$build_prop)
+    ota_update="ventana-ota-${build_version}.zip"
     [ -f "$OUTDIR/$ota_update" ] || error "Missing file: $OUTDIR/$ota_update"
     manifest="system/etc/manifest.xml"
     [ -f "$OUTDIR/$manifest" ] || error "Missing file: $OUTDIR/$manifest"
     for i in $BUILD_ARTIFACTS $ota_update $manifest; do
-	cp -f "$OUTDIR"/$i "$DEV"
+	cp -af "$OUTDIR"/$i "$DEV"
     done
+    mkdir -p "$DEV"/system
+    cp -af $OUTDIR/$build_prop "$DEV"/system
     mkdir -p "$DEV"/boot/boot
-    cp -f $OUTDIR/boot/boot/*dtb "$DEV"/boot/boot
-    cp -f $OUTDIR/boot/boot/*bootscript* "$DEV"/boot/boot
+    cp -af $OUTDIR/boot/boot/*dtb "$DEV"/boot/boot
+    cp -af $OUTDIR/boot/boot/*bootscript* "$DEV"/boot/boot
     echo "All files copied to $DEV"
     exit 0
 }
