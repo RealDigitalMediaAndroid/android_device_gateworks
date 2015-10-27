@@ -26,7 +26,8 @@ BUILD_NUMBER:=$(shell date +%Y%m%d)-$(shell git rev-parse HEAD | cut -c -4)
 # repo status takes a while to run, and this file is included every time
 # make is run including the "lunch" command which runs make 10+ times
 ifneq (,$(filter droid otagenerate,$(MAKECMDGOALS)))
-ifneq (,$(shell git status -s)$(shell repo status))
+a_clean_repo := nothing to commit (working directory clean)
+ifneq ($(a_clean_repo),$(shell git status -s)$(shell repo status -j 16))
 	BUILD_NUMBER:=$(BUILD_NUMBER)+
 endif
 endif
