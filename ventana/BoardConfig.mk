@@ -56,7 +56,7 @@ TARGET_BOARD_DTS_CONFIG := \
 #  kernel_imx/drivers/net/wireless/rt2x00/rt2x00lib.ko:system/lib/modules/
 
 BOARD_SEPOLICY_DIRS := \
-  device/fsl/ventana/sepolicy
+  device/gateworks/ventana/sepolicy
 
 BOARD_SEPOLICY_UNION := \
   app.te \
