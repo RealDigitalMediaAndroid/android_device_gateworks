@@ -6,3 +6,7 @@
 /dev/ubi0_3                   u:object_r:block_device:s0
 /dev/ubi0_4                   u:object_r:block_device:s0
 /dev/ubi0_5                   u:object_r:block_device:s0
+#############################
+# boot and recovery files
+/boot(/.*)?		u:object_r:system_file:s0
+/recovery(/.*)?		u:object_r:system_file:s0

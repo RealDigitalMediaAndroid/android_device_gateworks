@@ -8,15 +8,16 @@ def InstallBootAndRecovery(info):
         file = info.input_zip.read(filename)
         common.ZipWriteStr(info.output_zip, filename, file)
     # error: make_ext4fs_internal: cannot lookup security context for /boot/
-    # info.script.FormatPartition("/boot")
+    info.script.FormatPartition("/boot")
     info.script.Mount("/boot")
     info.script.UnpackPackageDir("BOOT_EXTRA", "/boot")
     info.script.AppendExtra('package_extract_file("boot.img", "/boot/boot.img");')
     # TODO: do this differently, the current process generates recovery.img
     # on the next boot. So, if boot.img is bad, we're screwed.
-    # info.script.FormatPartition("/recovery")
+    info.script.FormatPartition("/recovery")
     info.script.Mount("/recovery")
     info.script.UnpackPackageDir("BOOT_EXTRA", "/recovery")
+    info.script.AppendExtra('package_extract_file("recovery.img", "/recovery/recovery.img");')
 
 def InstallBootloader(info):
     # Copy BOOTLOADER directory contents to output
