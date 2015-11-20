@@ -156,7 +156,7 @@ else
 	fi
 fi
 
-setenv bootargs "${bootargs}" androidboot.hardware=freescale androidboot.console=${console} androidboot.product.model=${model} androidboot.serialno=${serial#} 
+setenv bootargs "${bootargs}" androidboot.hardware=freescale androidboot.console=${console} androidboot.product.model=${model} androidboot.serialno=${serial#} androidboot.ethaddr=${gw_ethaddr}
 
 if itest.s "x${dtype}" == "xnand" ; then
 	echo "Booting from NAND..."
