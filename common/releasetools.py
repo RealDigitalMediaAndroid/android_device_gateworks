@@ -33,6 +33,14 @@ def InstallBootloader(info):
     info.script.AppendExtra('run_program("/res/nandwrite", "--start=0xe00000", "--pad", "/dev/mtd/mtd0", "/u-boot.img");')
     info.script.AppendExtra('run_program("/res/flash_erase", "/dev/mtd/mtd1", "0", "0");')
 
+def InstallExtraSync(info):
+    # Unmount doesn't work, so do this:
+    info.script.AppendExtra('run_program("sync");')
+    info.script.AppendExtra('run_program("sync");')
+    info.script.AppendExtra('run_program("sleep", "10");')
+    info.script.AppendExtra('run_program("sync");')
+
 def FullOTA_InstallEnd(info):
     InstallBootAndRecovery(info)
     InstallBootloader(info)
+    InstallExtraSync(info)
