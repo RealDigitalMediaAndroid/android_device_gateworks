@@ -4,6 +4,8 @@
 #    /etc/resolv.conf should already be a symlink to /data/etc/resolv.conf
 #    ngrok binary must exist and be executable in /system/bin
 
-LOG_OPTIONS="-log=/sdcard/ngrok.log"
+LOG_FILE="/sdcard/ngrok/ngrok.log"
+mkdir -p $(busybox dirname ${LOG_FILE})
+LOG_OPTIONS="-log=${LOG_FILE} -log-level=INFO"
 AUTH="--config /system/etc/ngrok.yml"
 /system/bin/ngrok $AUTH $LOG_OPTIONS -proto=tcp 22
