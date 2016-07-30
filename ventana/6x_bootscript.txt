@@ -1,7 +1,9 @@
 echo "Gateworks Ventana Android Boot script v1.03"
-echo "RDM BootScript Modifications v4"
+echo "RDM BootScript Modifications v5"
 
 # RDM Changes
+# v5 - load /boot/video_mode if it exists, otherwise let
+#      the kernel pick the best mode from the monitor's modelist
 # v4 - turn on gsc watchdog
 # v3 - fixed part environment variable shadowing ours
 # v2 - use android boot images to make life easier
@@ -15,13 +17,16 @@ gsc wd enable 60
 test -n "$fs"    || fs=ext2
 test -n "$disk"  || disk=0
 test -n "$part"  || setenv part 1
-setenv nextcon 0
-setenv video_default video=mxcfb0:dev=hdmi,bpp=32,1920x1080M@60,if=RGB24 video=mxcfb1:off video=mxcfb2:off video=mxcfb3:off
 setenv bootargs console=${console},${baudrate} ubi.mtd=2
 setenv loadaddr 10800000
 setenv fdt_addr 18000000
 # setenv rd_addr  16000000
 setenv boot_img boot.img
+
+# check for a video mode to use
+# file should look like this (trailing newline is optional):
+# hdmi=1920x1080
+${fs}load ${dtype} ${disk}:${part} ${loadaddr} video_mode && env import -t ${loadaddr} ${filesize}
 
 # boot from partition 2 for Android recovery
 if itest.s "x${android_recovery}" == "x1"; then
@@ -42,83 +47,16 @@ else
 fi
 setenv bootargs "${bootargs}" "${mem}"
 
-# detect displays in the following priority: HDMI, LVDS
 # setenv display to override detection for a single display
 # or setenv video if you want multiple displays
 if test -n "$video" ; then
   echo "using video config from env: $video"
   setenv bootargs "${bootargs}" "${video}"
 else
-  if test -n "$display" ; then
-    echo "using display from env: $display"
-  elif test -n "$panel" ; then
-    echo "using display from env: $panel"
-    setenv display "$panel"
-  else
-    echo "Detecting displays..."
-    i2c dev 2
-    if hdmidet ; then
-	echo "  HDMI detected"
-	setenv display "HDMI"
-    elif i2c probe 0x04 ; then
-	echo "  Freescale MXC-LVDS1 detected"
-	setenv display "LVDS"
-    elif i2c probe 0x14 ; then
-	echo "  DLC800FIGT3 detected"
-	setenv display "LVDS"
-    elif i2c probe 0x38 ; then
-	echo "  DLC700JMGT4 detected"
-	setenv display "LVDS"
-    fi
+  if test -n "$hdmi" ; then
+	echo "  mxcfb0: HDMI ($hdmi)"
+	setenv bootargs "${bootargs}" video=mxcfb0:dev=hdmi,bpp=32,${hdmi},if=RGB24
   fi
-
-  # configure displays
-  echo "Configuring kernel bootargs for display(s): $display"
-  for p in ${display}; do
-    if itest.s "x${p}" == "xHannstar-XGA" ; then
-	setenv ptype "LVDS"
-    elif itest.s "x${p}" == "xDLC700JMGT4" ; then
-	setenv ptype "LVDS"
-    elif itest.s "x${p}" == "xDLC800FIGT3" ; then
-	setenv ptype "LVDS"
-    elif itest.s "x${p}" == "xLVDS" ; then
-	setenv ptype "LVDS"
-    elif itest.s "x${p}" == "xHDMI" ; then
-	setenv ptype "HDMI"
-	test -n "$hdmi" || hdmi=1080p
-	if itest.s "x${hdmi}" == "x1080p" ; then
-		setenv hdmi "1920x1080M@60"
-	elif itest.s "x${hdmi}" == "x720p" ; then
-		setenv hdmi "1280x720M@60"
-	elif itest.s "x${hdmi}" == "x480p" ; then
-		setenv hdmi "720x480M@60"
-	fi
-    else
-        echo "${p} not supported"
-    fi
-
-    if itest.s "x${ptype}" == "xLVDS" ; then
-	echo "  mxcfb${nextcon}: LVDS ($p)"
-	setenv bootargs "${bootargs}" video=mxcfb${nextcon}:dev=ldb,bpp=32,if=RGB666
-	setexpr nextcon $nextcon + 1
-    elif itest.s "x${ptype}" == "xHDMI" ; then
-	echo "  mxcfb${nextcon}: HDMI ($hdmi)"
-	setenv bootargs "${bootargs}" video=mxcfb${nextcon}:dev=hdmi,bpp=32,${hdmi},if=RGB24
-	setexpr nextcon $nextcon + 1
-    fi
-
-  done
-
-  if test "0" = $nextcon ; then
-	setenv bootargs "${bootargs}" ${video_default}
-	setenv nextcon 4
-  fi
-
-  # disable remaining mxcfb devices
-  while test "4" -ne $nextcon ; do
-	setenv bootargs "${bootargs}" video=mxcfb${nextcon}:off
-	setexpr nextcon $nextcon + 1
-  done
 fi
 
 # set minimum GPU frequency scaling
